@@ -64,6 +64,23 @@ function create (initOptions) {
     return crypto.timingSafeEqual(sig, signed)
   }
 
+  function verifyGitee (signature, data, json) {
+    if (json.sign) {
+      const sig = Buffer.from(signature)
+      const signed = Buffer.from(crypto.createHmac('sha256', options.secret).update(`${json.timestamp}\n${options.secret}`).digest('base64'))
+      if (sig.length !== signed.length) {
+        return false
+      }
+      return crypto.timingSafeEqual(sig, signed)
+    } else {
+      return signature === json.password
+    }
+  }
+
+  function verifyGitlab (signature, data, json) {
+    return signature === json.password
+  }
+
   function handler (req, res, callback) {
     let events
 
@@ -89,25 +106,49 @@ function create (initOptions) {
       callback(err)
     }
 
-    const sig = req.headers['x-hub-signature']
-    const event = req.headers['x-github-event']
-    const id = req.headers['x-github-delivery']
+    // get platform
+    const ua = req.headers['user-agent']
+    const keyMap = {
+      gitlab: false,
+      sig: 'x-hub-signature',
+      event: 'x-github-event',
+      id: 'x-github-delivery',
+      verify
+    }
+    // gitee
+    if (ua === 'git-oschina-hook') {
+      keyMap.sig = 'x-gitee-token'
+      keyMap.event = 'x-gitee-event'
+      keyMap.id = 'x-gitee-timestamp'
+      keyMap.verify = verifyGitee
+    } else if (req.headers['x-gitlab-token']) {
+      // gitlab
+      keyMap.gitlab = true
+      keyMap.sig = 'x-gitlab-token'
+      keyMap.event = 'x-gitlab-event'
+      keyMap.id = 'x-gitlab-token'
+      keyMap.verify = verifyGitlab
+    }
+    const sig = req.headers[keyMap.sig]
+    const event = req.headers[keyMap.event]
+    const id = req.headers[keyMap.id]
 
     if (!sig) {
-      return hasError('No X-Hub-Signature found on request')
+      return hasError(`No ${keyMap.sig} found on request`)
     }
 
     if (!event) {
-      return hasError('No X-Github-Event found on request')
+      return hasError(`No ${keyMap.event} found on request`)
     }
 
     if (!id) {
-      return hasError('No X-Github-Delivery found on request')
+      return hasError(`No ${keyMap.id} found on request`)
     }
 
     if (events && events.indexOf(event) === -1) {
-      return hasError('X-Github-Event is not acceptable')
+      return hasError(`No ${keyMap.event} found on request`)
     }
+    console.log(event, event === 'Push Hook')
 
     req.pipe(bl((err, data) => {
       if (err) {
@@ -116,14 +157,18 @@ function create (initOptions) {
 
       let obj
 
-      if (!verify(sig, data)) {
-        return hasError('X-Hub-Signature does not match blob signature')
-      }
-
       try {
         obj = JSON.parse(data.toString())
+        if (keyMap.gitlab) {
+          // gitlab 不需要验证
+          obj.password = sig
+        }
       } catch (e) {
         return hasError(e)
+      }
+
+      if (!keyMap.verify(sig, data, obj)) {
+        return hasError(`${keyMap.sig} does not match blob signature`)
       }
 
       res.writeHead(200, { 'content-type': 'application/json' })
@@ -139,7 +184,15 @@ function create (initOptions) {
         path: options.path
       }
 
-      handler.emit(event, emitData)
+      // set common event
+      function commonEvent (event) {
+        if (event === 'Push Hook') {
+          return 'push'
+        }
+        return event
+      }
+
+      handler.emit(commonEvent(event), emitData)
       handler.emit('*', emitData)
     }))
   }

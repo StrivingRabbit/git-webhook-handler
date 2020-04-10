@@ -1,8 +1,10 @@
-# github-webhook-handler
+# git-webhook-handler
 
 [![Build Status](https://travis-ci.org/rvagg/github-webhook-handler.svg?branch=master)](https://travis-ci.org/rvagg/github-webhook-handler)
 
 [![NPM](https://nodei.co/npm/github-webhook-handler.svg)](https://nodei.co/npm/github-webhook-handler/)
+
+Fork form github-webhook-handler, support gitee , gitlab.
 
 GitHub allows you to register **[Webhooks](https://developer.github.com/webhooks/)** for your repositories. Each time an event occurs on your repository, whether it be pushing code, filling issues or creating pull requests, the webhook address you register can be configured to be pinged with details.
 
@@ -18,7 +20,7 @@ In Github Webhooks settings, Content type must be `application/json`.
 
 ```js
 var http = require('http')
-var createHandler = require('github-webhook-handler')
+var createHandler = require('git-webhook-handler')
 var handler = createHandler({ path: '/webhook', secret: 'myhashsecret' })
 
 http.createServer(function (req, res) {
@@ -51,7 +53,7 @@ for multiple handlers, please see [multiple-handlers-issue](https://github.com/r
 
 ## API
 
-github-webhook-handler exports a single function, use this function to *create* a webhook handler by passing in an *options* object. Your options object should contain:
+git-webhook-handler exports a single function, use this function to *create* a webhook handler by passing in an *options* object. Your options object should contain:
 
  * `"path"`: the complete case sensitive path/route to match when looking at `req.url` for incoming requests. Any request not matching this path will cause the callback function to the handler to be called (sometimes called the `next` handler).
  * `"secret"`: this is a hash key used for creating the SHA-1 HMAC signature of the JSON blob sent by GitHub. You should register the same secret key with GitHub. Any request not delivering a `X-Hub-Signature` that matches the signature generated using this key against the blob will be rejected and cause an `'error'` event (also the callback will be called with an `Error` object).
@@ -66,7 +68,7 @@ See the [GitHub Webhooks documentation](https://developer.github.com/webhooks/) 
 Included in the distribution is an *events.json* file which maps the event names to descriptions taken from the API:
 
 ```js
-var events = require('github-webhook-handler/events')
+var events = require('git-webhook-handler/events')
 Object.keys(events).forEach(function (event) {
   console.log(event, '=', events[event])
 })
@@ -75,5 +77,7 @@ Object.keys(events).forEach(function (event) {
 Additionally, there is a special `'*'` even you can listen to in order to receive _everything_.
 
 ## License
+
+**Fork form github-webhook-handler**
 
 **github-webhook-handler** is Copyright (c) 2014 Rod Vagg and licensed under the MIT License. All rights not explicitly granted in the MIT License are reserved. See the included [LICENSE.md](./LICENSE.md) file for more details.

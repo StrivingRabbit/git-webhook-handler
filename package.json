@@ -1,9 +1,9 @@
 {
-  "name": "github-webhook-handler",
+  "name": "git-webhook-handler",
   "version": "1.0.0",
-  "description": "Web handler / middleware for processing GitHub Webhooks",
-  "main": "github-webhook-handler.js",
-  "types": "github-webhook-handler.d.ts",
+  "description": "Web handler / middleware for processing GitHub, Gitee, Gitlab Webhooks",
+  "main": "git-webhook-handler.js",
+  "types": "git-webhook-handler.d.ts",
   "scripts": {
     "lint": "standard *.js",
     "test": "npm run lint && node test.js"
@@ -12,10 +12,10 @@
     "github",
     "webhooks"
   ],
-  "author": "Rod Vagg <r@va.gg> (http://r.va.gg)",
+  "author": "Rem486 (http://rem486.top/)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rvagg/github-webhook-handler.git"
+    "url": "https://github.com/Rem486/git-webhook-handler.git"
   },
   "license": "MIT",
   "dependencies": {
