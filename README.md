@@ -1,8 +1,10 @@
 # git-webhook-handler
 
-[![Build Status](https://travis-ci.org/rvagg/github-webhook-handler.svg?branch=master)](https://travis-ci.org/rvagg/github-webhook-handler)
+[![Build Status](https://travis-ci.com/Rem486/git-webhook-handler.svg?branch=master](https://travis-ci.com/github/Rem486/git-webhook-handler)
 
-[![NPM](https://nodei.co/npm/github-webhook-handler.svg)](https://nodei.co/npm/github-webhook-handler/)
+[![NPM](https://nodei.co/npm/git-webhook-handler.svg)](https://nodei.co/npm/git-webhook-handler/)
+
+处理 webhook 钩子，支持 github, gitee, gitlab
 
 Fork form github-webhook-handler, support gitee , gitlab.
 

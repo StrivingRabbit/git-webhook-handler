@@ -9,6 +9,6 @@ node_js:
 branches:
   only:
     - master
-notifications:
-  email:
-    - rod@vagg.org
+#notifications:
+#  email:
+#    - rod@vagg.org
