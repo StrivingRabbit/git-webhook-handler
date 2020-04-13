@@ -1,6 +1,6 @@
 # git-webhook-handler
 
-[![Build Status](https://travis-ci.com/Rem486/git-webhook-handler.svg?branch=master](https://travis-ci.com/github/Rem486/git-webhook-handler)
+[![Build Status](https://travis-ci.com/Rem486/git-webhook-handler.svg?branch=master)](https://travis-ci.com/github/Rem486/git-webhook-handler)
 
 [![NPM](https://nodei.co/npm/git-webhook-handler.svg)](https://nodei.co/npm/git-webhook-handler/)
 
