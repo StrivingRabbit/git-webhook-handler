@@ -338,7 +338,7 @@ test('handler rejects a badly signed blob', (t) => {
     t.strictEqual(_req, req, 'was given original request object')
     t.equal(res.$statusCode, 400, 'correct status code')
     t.deepEqual(res.$headers, { 'content-type': 'application/json' })
-    t.equal(res.$end, '{"error":"X-Hub-Signature does not match blob signature"}', 'got correct content')
+    t.equal(res.$end, '{"error":"x-hub-signature does not match blob signature"}', 'got correct content')
   })
 
   h.on('push', (event) => {
