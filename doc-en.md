@@ -4,7 +4,7 @@
 
 [![NPM](https://nodei.co/npm/git-webhook-handler.svg)](https://nodei.co/npm/git-webhook-handler/)
 
-处理 webhook 钩子，支持 github, gitee, gitlab。[English Document](/doc-en.md)
+Handle webhooks, support github, gitee, gitlab
 
 Fork form github-webhook-handler, support gitee , gitlab.
 
