@@ -1,6 +1,6 @@
 {
   "name": "git-webhook-handler",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Web handler / middleware for processing GitHub, Gitee, Gitlab Webhooks",
   "main": "git-webhook-handler.js",
   "types": "git-webhook-handler.d.ts",
