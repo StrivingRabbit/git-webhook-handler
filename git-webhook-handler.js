@@ -92,7 +92,7 @@ function create (initOptions) {
       events = options.events
     }
 
-    if (req.url !== options.path || req.method !== 'POST') {
+    if (req.url.split('?').shift() !== options.path || req.method !== 'POST') {
       return callback()
     }
 
