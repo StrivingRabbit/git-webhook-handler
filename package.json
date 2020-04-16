@@ -10,10 +10,12 @@
   },
   "keywords": [
     "node",
+    "webhooks",
     "github",
     "gitee",
     "gitlab",
-    "webhooks"
+    "gitea",
+    "gogs"
   ],
   "author": "Rem486 (http://rem486.top/)",
   "repository": {

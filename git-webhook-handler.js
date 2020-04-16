@@ -73,12 +73,17 @@ function create (initOptions) {
       }
       return crypto.timingSafeEqual(sig, signed)
     } else {
-      return signature === json.password
+      return signature === options.secret
     }
   }
 
-  function verifyGitlab (signature, data, json) {
-    return signature === json.password
+  function verifyGitlab (signature) {
+    return signature === options.secret
+  }
+
+  function verifyGiteaGogs (signature, data, json) {
+    const expected = crypto.createHmac('sha256', options.secret).update(JSON.stringify(json, null, 2)).digest('hex')
+    return Buffer.from(expected).equals(Buffer.from(signature))
   }
 
   function handler (req, res, callback) {
@@ -109,7 +114,6 @@ function create (initOptions) {
     // get platform
     const ua = req.headers['user-agent']
     const keyMap = {
-      gitlab: false,
       sig: 'x-hub-signature',
       event: 'x-github-event',
       id: 'x-github-delivery',
@@ -123,12 +127,24 @@ function create (initOptions) {
       keyMap.verify = verifyGitee
     } else if (req.headers['x-gitlab-token']) {
       // gitlab
-      keyMap.gitlab = true
       keyMap.sig = 'x-gitlab-token'
       keyMap.event = 'x-gitlab-event'
       keyMap.id = 'x-gitlab-token'
       keyMap.verify = verifyGitlab
+    } else if (req.headers['x-gitea-signature']) {
+      // gitea
+      keyMap.sig = 'x-gitea-signature'
+      keyMap.event = 'x-gitea-event'
+      keyMap.id = 'x-gitea-delivery'
+      keyMap.verify = verifyGiteaGogs
+    } else if (req.headers['x-gogs-signature']) {
+      // gogs
+      keyMap.sig = 'x-gogs-signature'
+      keyMap.event = 'x-gogs-event'
+      keyMap.id = 'x-gogs-delivery'
+      keyMap.verify = verifyGiteaGogs
     }
+
     const sig = req.headers[keyMap.sig]
     const event = req.headers[keyMap.event]
     const id = req.headers[keyMap.id]
@@ -148,7 +164,6 @@ function create (initOptions) {
     if (events && events.indexOf(event) === -1) {
       return hasError(`No ${keyMap.event} found on request`)
     }
-    console.log(event, event === 'Push Hook')
 
     req.pipe(bl((err, data) => {
       if (err) {
@@ -159,10 +174,6 @@ function create (initOptions) {
 
       try {
         obj = JSON.parse(data.toString())
-        if (keyMap.gitlab) {
-          // gitlab 不需要验证
-          obj.password = sig
-        }
       } catch (e) {
         return hasError(e)
       }
@@ -188,6 +199,9 @@ function create (initOptions) {
       function commonEvent (event) {
         if (event === 'Push Hook') {
           return 'push'
+        }
+        if (event === 'Issue Hook') {
+          return 'issues'
         }
         return event
       }

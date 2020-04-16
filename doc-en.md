@@ -4,9 +4,9 @@
 
 [![NPM](https://nodei.co/npm/git-webhook-handler.svg)](https://nodei.co/npm/git-webhook-handler/)
 
-Handle webhooks, support github, gitee, gitlab
+Handle webhooks, support github, gitee, gitlab, gitea, gogs.
 
-Fork form github-webhook-handler, support gitee , gitlab.
+Fork form github-webhook-handler, support gitee , gitlab, gitea, gogs.
 
 GitHub allows you to register **[Webhooks](https://developer.github.com/webhooks/)** for your repositories. Each time an event occurs on your repository, whether it be pushing code, filling issues or creating pull requests, the webhook address you register can be configured to be pinged with details.
 
