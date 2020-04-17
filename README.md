@@ -4,7 +4,7 @@
 
 [![NPM](https://nodei.co/npm/git-webhook-handler.svg)](https://nodei.co/npm/git-webhook-handler/)
 
-Fork form github-webhook-handler, add support for gitee , gitlab, gitea, gogs. [English Document](/doc-en.md)
+Fork form github-webhook-handler, add support for gitee , gitlab, gitea, gogs. [English Document](./doc-en.md)
 
 >网页开发中的网络钩子（Webhook）是一种通过自定义回调函数来增加或更改网页表现的方法。这些回调可被可能与原始网站或应用相关的第三方用户及开发者保存、修改与管理。术语“网络钩子”由杰夫·林德塞（Jeff Lindsay）于2007年通过给计算机编程术语“钩子”（Hook）加上前缀得来。[网络钩子](https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E9%92%A9%E5%AD%90)
 
@@ -59,7 +59,7 @@ handler.on('issues', function (event) {
 
 部署和启动服务后，在 git 仓库进行设置：
 
-![webhook-setting](/static/img/webhook-setting.jpg)
+![webhook-setting](./static/img/webhook-setting.jpg)
 
 ## API 介绍
 
