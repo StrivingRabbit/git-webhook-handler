@@ -9,11 +9,11 @@ Fork form github-webhook-handler, add support for gitee , gitlab, gitea, gogs. [
 >网页开发中的网络钩子（Webhook）是一种通过自定义回调函数来增加或更改网页表现的方法。这些回调可被可能与原始网站或应用相关的第三方用户及开发者保存、修改与管理。术语“网络钩子”由杰夫·林德塞（Jeff Lindsay）于2007年通过给计算机编程术语“钩子”（Hook）加上前缀得来。[网络钩子](https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E9%92%A9%E5%AD%90)
 
 基于 nodejs 实现对 webhook 处理的，支持:
-- github
-- gitee
-- gitlab
-- gitea
-- gogs
+- [github](https://developer.github.com/webhooks/)
+- [gitee](https://gitee.com/)
+- [gitlab](https://gitlab.com/)
+- [gitea](https://gitea.io/)
+- [gogs](https://gogs.io/)
 
 Git 服务器的仓库都提供了 Webhooks 功能。每当代码仓库中有事件发生时，比如 `push` 代码，提 `issue`，提交 `pull request`，都可以往你配置的 Webhook 地址发送一个带有操作和仓库详细信息的请求。根据请求的信息，我们可以运行特定操作，自动更新代码等。**[Github Webhooks 文档](https://developer.github.com/webhooks/)**
 
