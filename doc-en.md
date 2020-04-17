@@ -6,7 +6,7 @@
 
 Handle webhooks, support github, gitee, gitlab, gitea, gogs.
 
-Fork form github-webhook-handler, support gitee , gitlab, gitea, gogs.
+Fork form github-webhook-handler, add support for gitee , gitlab, gitea, gogs.
 
 GitHub allows you to register **[Webhooks](https://developer.github.com/webhooks/)** for your repositories. Each time an event occurs on your repository, whether it be pushing code, filling issues or creating pull requests, the webhook address you register can be configured to be pinged with details.
 
@@ -80,6 +80,6 @@ Additionally, there is a special `'*'` even you can listen to in order to receiv
 
 ## License
 
-**Fork form github-webhook-handler**
+[MIT](https://en.wikipedia.org/wiki/MIT_License)
 
-**github-webhook-handler** is Copyright (c) 2014 Rod Vagg and licensed under the MIT License. All rights not explicitly granted in the MIT License are reserved. See the included [LICENSE.md](./LICENSE.md) file for more details.
+**git-webhook-handler** is Copyright (c) 2020 Rem486 and licensed under the MIT License. All rights not explicitly granted in the MIT License are reserved. See the included [LICENSE.md](./LICENSE.md) file for more details.

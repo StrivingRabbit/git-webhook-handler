@@ -4,21 +4,27 @@
 
 [![NPM](https://nodei.co/npm/git-webhook-handler.svg)](https://nodei.co/npm/git-webhook-handler/)
 
-处理 webhook 钩子，支持 github, gitee, gitlab, gitea, gogs。[English Document](/doc-en.md)
+Fork form github-webhook-handler, add support for gitee , gitlab, gitea, gogs. [English Document](/doc-en.md)
 
-Fork form github-webhook-handler, support gitee , gitlab, gitea, gogs.
+>网页开发中的网络钩子（Webhook）是一种通过自定义回调函数来增加或更改网页表现的方法。这些回调可被可能与原始网站或应用相关的第三方用户及开发者保存、修改与管理。术语“网络钩子”由杰夫·林德塞（Jeff Lindsay）于2007年通过给计算机编程术语“钩子”（Hook）加上前缀得来。[网络钩子](https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E9%92%A9%E5%AD%90)
 
-GitHub allows you to register **[Webhooks](https://developer.github.com/webhooks/)** for your repositories. Each time an event occurs on your repository, whether it be pushing code, filling issues or creating pull requests, the webhook address you register can be configured to be pinged with details.
+基于 nodejs 实现对 webhook 处理的，支持:
+- github
+- gitee
+- gitlab
+- gitea
+- gogs
 
-This library is a small handler (or "middleware" if you must) for Node.js web servers that handles all the logic of receiving and verifying webhook requests from GitHub.
+Git 服务器的仓库都提供了 Webhooks 功能。每当代码仓库中有事件发生时，比如 `push` 代码，提 `issue`，提交 `pull request`，都可以往你配置的 Webhook 地址发送一个带有操作和仓库详细信息的请求。根据请求的信息，我们可以运行特定操作，自动更新代码等。**[Github Webhooks 文档](https://developer.github.com/webhooks/)**
 
-## Tips
+该库是Node.js Web服务器的小型处理程序，包含处理 Git 服务器发送的 Webhook 请求的所有逻辑。
 
-In Github Webhooks settings, Content type must be `application/json`.
+## 注意
 
-`application/x-www-form-urlencoded` won't work at present.
+在 Git 仓库的 Webhooks 设置里面, 需要设置 `Content-Type` 为 `application/json`。
 
-## Example
+## 例子🌰
+以 Github 为栗。
 
 ```js
 var http = require('http')
@@ -51,23 +57,23 @@ handler.on('issues', function (event) {
 })
 ```
 
-for multiple handlers, please see [multiple-handlers-issue](https://github.com/rvagg/github-webhook-handler/pull/22#issuecomment-274301907).
+部署和启动服务后，在 git 仓库进行设置：
 
-## API
+![webhook-setting](/static/img/webhook-setting.jpg)
 
-git-webhook-handler exports a single function, use this function to *create* a webhook handler by passing in an *options* object. Your options object should contain:
+## API 介绍
 
- * `"path"`: the complete case sensitive path/route to match when looking at `req.url` for incoming requests. Any request not matching this path will cause the callback function to the handler to be called (sometimes called the `next` handler).
- * `"secret"`: this is a hash key used for creating the SHA-1 HMAC signature of the JSON blob sent by GitHub. You should register the same secret key with GitHub. Any request not delivering a `X-Hub-Signature` that matches the signature generated using this key against the blob will be rejected and cause an `'error'` event (also the callback will be called with an `Error` object).
- * `"events"`: an optional array of whitelisted event types (see: *events.json*). If defined, any incoming request whose `X-Github-Event` can't be found in the whitelist will be rejected. If only a single event type is acceptable, this option can also be a string.
+`git-webhook-handler` 会导出一个方法，通过这个方法来创建 webhook 的处理函数 **handler**。你需要提供一个 `options` 来确定一些参数：
 
-The resulting **handler** function acts like a common "middleware" handler that you can insert into a processing chain. It takes `request`, `response`, and `callback` arguments. The `callback` is not called if the request is successfully handled, otherwise it is called either with an `Error` or no arguments.
+ * `"path"`: `${服务器地址/域名}:${端口号}${options.path}` 就是最后的请求地址，填写在 git 仓库里面的。
+ * `"secret"`: 可以是一串随机字符串、hash。用来验证请求的，有的 Git 服务器会加密后返回，有的直接返回。比如 Github 是 `HMAC SHA-1`加密后放在请求头的 `x-hub-signature` 里面 [Payloads](https://developer.github.com/webhooks/#payloads)，我们拿到这个 `signature` ，对比验证后，如果通过就可以执行定义好的对应事件的后续操作了。没有通过的话，会抛出 `error` 事件。
+ * `"events"`: 一个事件数组/字符串(事件参考: *events.json*)，可选。会验证请求携带的事件参数是否在数组里面。比如 Github 是在请求的 `x-github-event` 。如果不存在也会抛出 `error`。
 
-The **handler** function is also an `EventEmitter` that you can register to listen to any of the GitHub event types. Note you can be specific in your GitHub configuration about which events you wish to receive, or you can send them all. Note that the `"error"` event will be liberally used, even if someone tries the end-point and they can't generate a proper signature, so you should at least register a listener for it or it will throw.
+返回的 **handler** 函数接受三个参数：`request`, `response`, `callback`。如果验证失败则执行 `callback` 回调。
 
-See the [GitHub Webhooks documentation](https://developer.github.com/webhooks/) for more details on the events you can receive.
+**handler** 函数继承自 `EventEmitter`。所以可以在上面注册对应事件来处理 Git 服务器发来的具体事件类型。
 
-Included in the distribution is an *events.json* file which maps the event names to descriptions taken from the API:
+可以通过下面的代码，查看 *events.json* 里面预先定义了一些事件。
 
 ```js
 var events = require('git-webhook-handler/events')
@@ -76,10 +82,15 @@ Object.keys(events).forEach(function (event) {
 })
 ```
 
-Additionally, there is a special `'*'` even you can listen to in order to receive _everything_.
+也可以使用通配符 `*` 来监听所有事件，在调试的时候非常有用。
+```js
+handler.on('*', function (event) {
+  console.log(event.event);
+});
+```
 
 ## License
 
-**Fork form github-webhook-handler**
+[MIT](https://en.wikipedia.org/wiki/MIT_License)
 
-**github-webhook-handler** is Copyright (c) 2014 Rod Vagg and licensed under the MIT License. All rights not explicitly granted in the MIT License are reserved. See the included [LICENSE.md](./LICENSE.md) file for more details.
+**git-webhook-handler** is Copyright (c) 2020 Rem486.具体查看 [LICENSE.md](./LICENSE.md)
