@@ -27,9 +27,9 @@ Git 服务器的仓库都提供了 Webhooks 功能。每当代码仓库中有事
 以 Github 为栗。
 
 ```js
-var http = require('http')
-var createHandler = require('git-webhook-handler')
-var handler = createHandler({ path: '/webhook', secret: 'myhashsecret' })
+const http = require('http')
+const createHandler = require('git-webhook-handler')
+const handler = createHandler({ path: '/webhook', secret: 'myhashsecret' })
 
 http.createServer(function (req, res) {
   handler(req, res, function (err) {
@@ -59,7 +59,7 @@ handler.on('issues', function (event) {
 
 部署和启动服务后，在 git 仓库进行设置：
 
-![webhook-setting](./static/img/webhook-setting.jpg)
+![webhook-setting](https://s1.ax1x.com/2020/04/20/JQnfsJ.jpg)
 
 ## API 介绍
 
@@ -68,6 +68,14 @@ handler.on('issues', function (event) {
  * `"path"`: `${服务器地址/域名}:${端口号}${options.path}` 就是最后的请求地址，填写在 git 仓库里面的。
  * `"secret"`: 可以是一串随机字符串、hash。用来验证请求的，有的 Git 服务器会加密后返回，有的直接返回。比如 Github 是 `HMAC SHA-1`加密后放在请求头的 `x-hub-signature` 里面 [Payloads](https://developer.github.com/webhooks/#payloads)，我们拿到这个 `signature` ，对比验证后，如果通过就可以执行定义好的对应事件的后续操作了。没有通过的话，会抛出 `error` 事件。
  * `"events"`: 一个事件数组/字符串(事件参考: *events.json*)，可选。会验证请求携带的事件参数是否在数组里面。比如 Github 是在请求的 `x-github-event` 。如果不存在也会抛出 `error`。
+
+`options` 也可以是一个数组：
+```js
+const handler = createHandler([
+  { path: '/webhook1', secret: 'myhashsecret1' },
+  { path: '/webhook2', secret: 'myhashsecret2' }
+])
+```
 
 返回的 **handler** 函数接受三个参数：`request`, `response`, `callback`。如果验证失败则执行 `callback` 回调。
 
