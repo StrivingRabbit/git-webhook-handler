@@ -22,6 +22,9 @@
     "type": "git",
     "url": "https://github.com/Rem486/git-webhook-handler.git"
   },
+  "bugs": {
+    "url": "https://github.com/Rem486/git-webhook-handler/issues"
+  },
   "license": "MIT",
   "dependencies": {
     "bl": "~4.0.0"
