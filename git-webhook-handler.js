@@ -80,7 +80,7 @@ function create (initOptions) {
   function verifyGitCode (signature, data, json) {
     const sign = json['x-gitcode-signature-256']
     if (sign) {
-      const sig = Buffer.from(sign)
+      const sig = Buffer.from(signature)
       const signed = Buffer.from(`sha256=${crypto.createHmac('sha256', options.secret).update(data).digest('hex')}`)
       if (sig.length !== signed.length) {
         return false
@@ -160,6 +160,7 @@ function create (initOptions) {
     } else if (ua === 'git-gitcode-hook') {
       // gitcode
       keyMap.sig = 'x-gitcode-token'
+      keyMap.signature = 'x-gitcode-signature-256'
       keyMap.event = 'x-gitcode-event'
       keyMap.id = 'x-gitcode-delivery'
       keyMap.verify = verifyGitCode
@@ -168,6 +169,10 @@ function create (initOptions) {
     const sig = req.headers[keyMap.sig]
     const event = req.headers[keyMap.event]
     const id = req.headers[keyMap.id]
+
+    if (ua === 'git-gitcode-hook' && !sig) {
+      sig = req.headers[keyMap.signature]
+    }
 
     if (!sig) {
       return hasError(`No ${keyMap.sig} found on request`)
