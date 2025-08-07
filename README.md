@@ -14,6 +14,7 @@ Fork form github-webhook-handler, add support for gitee , gitlab, gitea, gogs. [
 - [gitlab](https://gitlab.com/)
 - [gitea](https://gitea.io/)
 - [gogs](https://gogs.io/)
+- [gitcode](https://docs.gitcode.com/docs/help/home/org_project/webhook/web-hook)
 
 Git 服务器的仓库都提供了 Webhooks 功能。每当代码仓库中有事件发生时，比如 `push` 代码，提 `issue`，提交 `pull request`，都可以往你配置的 Webhook 地址发送一个带有操作和仓库详细信息的请求。根据请求的信息，我们可以运行特定操作，自动更新代码等。**[Github Webhooks 文档](https://developer.github.com/webhooks/)**
 
