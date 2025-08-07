@@ -77,6 +77,20 @@ function create (initOptions) {
     }
   }
 
+  function verifyGitCode (signature, data, json) {
+    const sign = json['x-gitcode-signature-256']
+    if (sign) {
+      const sig = Buffer.from(sign)
+      const signed = Buffer.from(`sha256=${crypto.createHmac('sha256', options.secret).update(data).digest('hex')}`)
+      if (sig.length !== signed.length) {
+        return false
+      }
+      return crypto.timingSafeEqual(sig, signed)
+    } else {
+      return signature === options.secret
+    }
+  }
+
   function verifyGitlab (signature) {
     return signature === options.secret
   }
@@ -143,6 +157,12 @@ function create (initOptions) {
       keyMap.event = 'x-gogs-event'
       keyMap.id = 'x-gogs-delivery'
       keyMap.verify = verifyGiteaGogs
+    } else if (ua === 'git-gitcode-hook') {
+      // gitcode
+      keyMap.sig = 'x-gitcode-token'
+      keyMap.event = 'x-gitcode-event'
+      keyMap.id = 'x-gitcode-delivery'
+      keyMap.verify = verifyGitCode
     }
 
     const sig = req.headers[keyMap.sig]

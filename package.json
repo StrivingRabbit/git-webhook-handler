@@ -1,7 +1,7 @@
 {
-  "name": "git-webhook-handler",
-  "version": "1.0.6",
-  "description": "Web handler / middleware for processing GitHub, Gitee, Gitlab Webhooks",
+  "name": "git-webhook-handler2",
+  "version": "1.0.0",
+  "description": "Web handler / middleware for processing GitCode, GitHub, Gitee, Gitlab Webhooks",
   "main": "git-webhook-handler.js",
   "types": "git-webhook-handler.d.ts",
   "scripts": {
@@ -12,18 +12,19 @@
     "node",
     "webhooks",
     "github",
+    "gitcode",
     "gitee",
     "gitlab",
     "gitea",
     "gogs"
   ],
-  "author": "Rem486 (http://rem486.top/)",
+  "author": "StrivingRabbit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Rem486/git-webhook-handler.git"
+    "url": "https://github.com/StrivingRabbit/git-webhook-handler"
   },
   "bugs": {
-    "url": "https://github.com/Rem486/git-webhook-handler/issues"
+    "url": "https://github.com/StrivingRabbit/git-webhook-handler/issues"
   },
   "license": "MIT",
   "dependencies": {
