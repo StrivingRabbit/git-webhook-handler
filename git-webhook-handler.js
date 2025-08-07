@@ -77,6 +77,20 @@ function create (initOptions) {
     }
   }
 
+  function verifyGitCode (signature, data, json) {
+    const sign = json['x-gitcode-signature-256']
+    if (sign) {
+      const sig = Buffer.from(sign)
+      const signed = Buffer.from(`sha256=${crypto.createHmac('sha256', options.secret).update(data).digest('hex')}`)
+      if (sig.length !== signed.length) {
+        return false
+      }
+      return crypto.timingSafeEqual(sig, signed)
+    } else {
+      return signature === options.secret
+    }
+  }
+
   function verifyGitlab (signature) {
     return signature === options.secret
   }
@@ -93,27 +107,27 @@ function create (initOptions) {
     let events
 
     options = findHandler(req.url, initOptions)
-    
+
     if (typeof options.events === 'string' && options.events !== '*') {
       events = [options.events]
     } else if (Array.isArray(options.events) && options.events.indexOf('*') === -1) {
       events = options.events
     }
-    
+
     if (req.url.split('?').shift() !== options.path || req.method !== 'POST') {
       return callback()
     }
-    
+
     function hasError (msg) {
       res.writeHead(400, { 'content-type': 'application/json' })
       res.end(JSON.stringify({ error: msg }))
-    
+
       const err = new Error(msg)
-    
+
       handler.emit('error', err, req)
       callback(err)
     }
-    
+
     // get platform
     const ua = req.headers['user-agent']
     const keyMap = {
@@ -151,48 +165,54 @@ function create (initOptions) {
         keyMap.event = 'x-codeup-event'
         keyMap.id = 'x-codeup-delivery'
         keyMap.verify = verifyCodeup
+    } else if (ua === 'git-gitcode-hook') {
+      // gitcode
+      keyMap.sig = 'x-gitcode-token'
+      keyMap.event = 'x-gitcode-event'
+      keyMap.id = 'x-gitcode-delivery'
+      keyMap.verify = verifyGitCode
     }
-    
+
     const sig = req.headers[keyMap.sig]
     const event = req.headers[keyMap.event]
     const id = req.headers[keyMap.id]
-    
+
     if (!sig) {
       return hasError(`No ${keyMap.sig} found on request`)
     }
-    
+
     if (!event) {
       return hasError(`No ${keyMap.event} found on request`)
     }
-    
+
     if (!id) {
       return hasError(`No ${keyMap.id} found on request`)
     }
-    
+
     if (events && events.indexOf(event) === -1) {
       return hasError(`No ${keyMap.event} found on request`)
     }
-    
+
     req.pipe(bl((err, data) => {
       if (err) {
         return hasError(err.message)
       }
-    
+
       let obj
-    
+
       try {
         obj = JSON.parse(data.toString())
       } catch (e) {
         return hasError(e)
       }
-    
+
       if (!keyMap.verify(sig, data, obj)) {
         return hasError(`${keyMap.sig} does not match blob signature`)
       }
-    
+
       res.writeHead(200, { 'content-type': 'application/json' })
       res.end('{"ok":true}')
-    
+
       const emitData = {
         event: event,
         id: id,
@@ -202,7 +222,7 @@ function create (initOptions) {
         url: req.url,
         path: options.path
       }
-    
+
       // set common event
       function commonEvent (event) {
         if (event === 'Push Hook') {
@@ -216,7 +236,7 @@ function create (initOptions) {
         }
         return event
       }
-    
+
       handler.emit(commonEvent(event), emitData)
       handler.emit('*', emitData)
     }))
