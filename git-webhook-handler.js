@@ -91,6 +91,20 @@ function create (initOptions) {
     }
   }
 
+  function verifyGitCode (signature, data, json) {
+    const sign = json['x-gitcode-signature-256']
+    if (sign) {
+      const sig = Buffer.from(signature)
+      const signed = Buffer.from(`sha256=${crypto.createHmac('sha256', options.secret).update(data).digest('hex')}`)
+      if (sig.length !== signed.length) {
+        return false
+      }
+      return crypto.timingSafeEqual(sig, signed)
+    } else {
+      return signature === options.secret
+    }
+  }
+
   function verifyGitlab (signature) {
     return signature === options.secret
   }
@@ -98,6 +112,10 @@ function create (initOptions) {
   function verifyGiteaGogs (signature, data, json) {
     const expected = crypto.createHmac('sha256', options.secret).update(JSON.stringify(json, null, 2)).digest('hex')
     return Buffer.from(expected).equals(Buffer.from(signature))
+  }
+
+  function verifyCodeup (signature) {
+    return signature === options.secret
   }
 
   function handler (req, res, callback) {
@@ -157,6 +175,11 @@ function create (initOptions) {
       keyMap.event = 'x-gogs-event'
       keyMap.id = 'x-gogs-delivery'
       keyMap.verify = verifyGiteaGogs
+    }else if (req.headers['x-codeup-token']){
+        keyMap.sig = 'x-codeup-token'
+        keyMap.event = 'x-codeup-event'
+        keyMap.id = 'x-codeup-delivery'
+        keyMap.verify = verifyCodeup
     } else if (ua === 'git-gitcode-hook') {
       // gitcode
       keyMap.sig = 'x-gitcode-token'
@@ -227,6 +250,9 @@ function create (initOptions) {
         }
         if (event === 'Issue Hook') {
           return 'issues'
+        }
+        if (event === 'Merge Request Hook'){
+        	return 'merge'
         }
         return event
       }
